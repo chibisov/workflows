@@ -1,5 +1,8 @@
 ## About
-Set of usefull alfred workflows. Alfa release.
+Set of usefull alfred workflows. Alfa release.  
+
+[![Build Status](https://travis-ci.org/chibisov/workflows.png?branch=master)](https://travis-ci.org/chibisov/workflows)
+
 The main difference from other workflows, that these could be used from console without alfred at all.  
 For example in alfred you could create reminder like this:
 
@@ -13,7 +16,7 @@ And there is no magic in parameters parsing. You just use standart console argum
 Python standart library is used. You don't need to install additional packages from pip (except for running tests)
 
 ## Workflows
-[Reminders.app workflow](Reminders.app workflow)
+[Reminders.app workflow](reminders/)
     
     r Watch Football -d tomorrow
 
