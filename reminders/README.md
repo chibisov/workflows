@@ -1,19 +1,3 @@
-Inspired with 
-* https://github.com/mlgill/alfred-workflow-create-reminder, http://www.alfredforum.com/topic/402-create-reminder-in-remindersapp-from-alfred/
-* http://www.alfredforum.com/topic/917-reminders/
-* http://www.alfredforum.com/topic/2416-reminders-11-a-light-version/?hl=reminders
-
-## Bugs
-* "eof" text in notification after reminder creation. That happens only if reminder really created (right list name)
-* prints "Created", even if no list exists. Should check, if list exists
-* Default list is "Personal". Should allow to specify custom default list.  
-http://www.alfredforum.com/topic/307-workflows-best-practices/  
-For example type "r --default-list", and select from autocomplete default list (current default should be colored)
-Should save it to alfred workflow settings xml file
-* Click by notification should go to reminders app
-* Cant set "hello \r\n" text. They stripped
-* Help text while typing with list of parameters.
-
 ## Usage
     
     r Watch Footbal
@@ -112,3 +96,19 @@ Full set of params:
 * -a, --after
 * -d, --date
 * -t, --time
+
+## TODO
+* "eof" text in notification after reminder creation. That happens only if reminder really created (right list name)
+* prints "Created", even if no list exists. Should check, if list exists
+* Default list is "Personal". Should allow to specify custom default list.  
+http://www.alfredforum.com/topic/307-workflows-best-practices/  
+For example type "r --default-list", and select from autocomplete default list (current default should be colored)
+Should save it to alfred workflow settings xml file
+* Click by notification should go to reminders app
+* Cant set "hello \r\n" text. They stripped
+* Help text while typing with list of parameters.
+
+## Inspired with 
+* https://github.com/mlgill/alfred-workflow-create-reminder, http://www.alfredforum.com/topic/402-create-reminder-in-remindersapp-from-alfred/
+* http://www.alfredforum.com/topic/917-reminders/
+* http://www.alfredforum.com/topic/2416-reminders-11-a-light-version/?hl=reminders
