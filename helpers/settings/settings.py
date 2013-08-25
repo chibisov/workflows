@@ -17,7 +17,15 @@ class SettingsBackend(dict):
     """
     def __init__(self, file_path=None):
         self.file_path = file_path or '{0}/settings.json'.format(os.getcwd())
-        self.update(json.load(self._open(self.file_path)))
+        self.reload()
+
+    def reload(self):
+        try:
+            self.update(json.load(self._open(self.file_path)))
+        except ValueError:
+            pass
+        except IOError:
+            self._write('')  # create file if it is not exist
 
     def save(self):
         self._write(content=json.dumps(self))
@@ -26,6 +34,6 @@ class SettingsBackend(dict):
         return open(file_path, mode)
 
     def _write(self, content):
-        file_instance = self._open(self.file_path, 'w')
+        file_instance = self._open(self.file_path, 'w+')
         file_instance.write(content)
         file_instance.close()

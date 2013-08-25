@@ -6,7 +6,7 @@ from unittest import TestCase
 import datetime
 from StringIO import StringIO
 
-from reminders import Main, ReminderBackendBase, ReminderBackend
+from reminders import Main, ReminderBackendBase, ReminderBackend, SettingsBackend
 
 
 def force_str(value):
@@ -17,6 +17,15 @@ def force_str(value):
             return value
     else:
         return value
+
+def clean_settings():
+    try:
+        open(SETTINGS_BACKEND.file_path, 'w').write('')
+    except OSError:
+        pass
+
+
+SETTINGS_BACKEND = SettingsBackend(file_path='/tmp/test_settings.json')
 
 
 class TestReminderBackend(ReminderBackendBase):
@@ -37,7 +46,9 @@ class TestMainGetKwargs(TestCase):
             datetime=self.datetime_mock, 
             reminder_backend=self.reminder_backend,
             stdout=self.stdout,
-        )        
+            settings_backend=SETTINGS_BACKEND,
+        )
+        clean_settings()
 
     def assertExperiments(self, experiments, kwarg_key, kwarg_name):
         for exp in experiments:
@@ -357,6 +368,19 @@ class TestMainGetKwargs(TestCase):
         ]
         self.assertExperiments(experiments=experiments, kwarg_key='time', kwarg_name='time')
 
+    def test_set_default_list(self):
+        experiments = [
+            {
+                'args_string': u'--set-default-list Личный список',
+                'expected': u'Личный список'
+            },
+            {
+                'args_string': u'-sdl Рабочий список',
+                'expected': u'Рабочий список'
+            }
+        ]
+        self.assertExperiments(experiments=experiments, kwarg_key='set_default_list', kwarg_name='set default list')
+
 
 class TestMainGetKwargsForReminderBackend(TestCase):
     def setUp(self):
@@ -367,7 +391,9 @@ class TestMainGetKwargsForReminderBackend(TestCase):
             datetime=self.datetime_mock, 
             reminder_backend=self.reminder_backend,
             stdout=self.stdout,
+            settings_backend=SETTINGS_BACKEND,
         )
+        clean_settings()
 
     def assertExperiments(self, experiments):
         for exp in experiments:
@@ -562,6 +588,42 @@ class TestMainGetKwargsForReminderBackend(TestCase):
         ]  
         self.assertExperiments(experiments)   
 
+    def test_with_default_list(self):
+        self.datetime_mock.date.today = Mock(return_value=datetime.date(year=1990, month=3, day=5))
+        self.datetime_mock.datetime.now = Mock(return_value=datetime.datetime(year=1990, month=3, day=5))
+        default_date_time = self.datetime_mock.datetime.now() + self.datetime_mock.timedelta(minutes=10)
+        
+        self.instance.settings_backend['default_list_name'] = u'Спорт'
+        self.instance.settings_backend.save()
+        experiments = [
+            # test, that default list used
+            {
+                'kwargs': {
+                    'text': 'Watch Football',
+                },
+                'expected': {
+                    'text': 'Watch Football',
+                    'list_name': u'Спорт',
+                    'note': None,
+                    'date_time': default_date_time
+                }
+            },
+            # test, that used list from arguments
+            {
+                'kwargs': {
+                    'text': 'Watch Football',
+                    'list': 'Sports'
+                },
+                'expected': {
+                    'text': 'Watch Football',
+                    'list_name': 'Sports',
+                    'note': None,
+                    'date_time': default_date_time
+                }
+            },
+        ]
+        self.assertExperiments(experiments)
+
 
 class TestMainRun(TestCase):
     def setUp(self):
@@ -572,7 +634,9 @@ class TestMainRun(TestCase):
             datetime=self.datetime_mock, 
             reminder_backend=self.reminder_backend,
             stdout=self.stdout,
+            settings_backend=SETTINGS_BACKEND,
         )
+        clean_settings()
         self.backend_kwargs = {
             'text': u'Посмотреть Футбол',
             'list_name': 'Personal',
@@ -588,7 +652,19 @@ class TestMainRun(TestCase):
 
     def test_should_write_to_stdout_success_text(self):
         self.instance.run(u'Посмотреть Футбол')
-        self.assertEqual(self.instance.stdout.getvalue(), u'Created reminder: Посмотреть Футбол\n'.encode('utf-8'))
+        expected = u'Created reminder "Посмотреть Футбол" in list "Personal"\n'.encode('utf-8')
+        self.assertEqual(self.instance.stdout.getvalue(), expected)
+
+    def test_should_create_and_save_to_settings_file_default_list(self):
+        self.instance.run(u'--set-default-list Личный')
+        self.instance.settings_backend.reload()
+        self.assertEqual(self.instance.settings_backend.get('default_list_name'), u'Личный')
+
+    def test_should_write_to_stdout_success_message_about_default_list(self):
+        self.instance.run(u'--set-default-list Личный')
+        self.instance.settings_backend.reload()
+        expected = u'Reminder list "{0}" is set as default\n'.format(u'Личный').encode('utf-8')
+        self.assertEqual(self.instance.stdout.getvalue(), expected)
 
 
 if __name__ == '__main__':

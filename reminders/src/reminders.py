@@ -63,11 +63,54 @@ class ReminderBackend(ReminderBackendBase):
         }
 
 
+# helpers/settings/settings.py
+import os
+import json
+
+
+class SettingsBackend(dict):
+    """
+    Usage:
+        >> settings = SettingsBackend('/home/user/settings.json')
+        >> settings['default_list'] = 'Personal'
+        >> settings.save()  # flush json to /home/user/settings.json
+
+        or without file_path current working directory would be used
+
+        >> settings = SettingsBackend()
+        >> print settings['default_list']
+        Personal
+    """
+    def __init__(self, file_path=None):
+        self.file_path = file_path or '{0}/settings.json'.format(os.getcwd())
+        self.reload()
+
+    def reload(self):
+        try:
+            self.update(json.load(self._open(self.file_path)))
+        except ValueError:
+            pass
+        except IOError:
+            self._write('')  # create file if it is not exists
+
+    def save(self):
+        self._write(content=json.dumps(self))
+
+    def _open(self, file_path, mode='r'):
+        return open(file_path, mode)
+
+    def _write(self, content):
+        file_instance = self._open(self.file_path, 'w+')
+        file_instance.write(content)
+        file_instance.close()
+
+
 class Main(object):
-    def __init__(self, datetime, reminder_backend, stdout):
+    def __init__(self, datetime, reminder_backend, stdout, settings_backend):
         self.datetime = datetime        
         self.reminder_backend = reminder_backend
         self.stdout = stdout
+        self.settings_backend = settings_backend
 
     def get_kwargs(self, args_string):
         parser = self.get_parser()
@@ -255,6 +298,12 @@ class Main(object):
             help='Reminder list',
             required=False
         )        
+        parser.add_argument(
+            '-sdl', 
+            '--set-default-list', 
+            help='Set reminders default list',
+            required=False
+        )        
         return parser
 
     def get_kwargs_for_reminder_backend(self, kwargs):
@@ -263,7 +312,7 @@ class Main(object):
     def _prepare_kwargs_for_reminder_backend(self, kwargs):
         return {
             'text': kwargs['text'],
-            'list_name': kwargs.get('list', 'Personal'),
+            'list_name': kwargs.get('list') or self.settings_backend.get('default_list_name') or 'Personal',
             'note': kwargs.get('note'),
             'date_time': self._get_datetime_for_reminder_backend(
                 after=kwargs.get('after'),
@@ -287,11 +336,21 @@ class Main(object):
     def run(self, args_string):
         # todo: wrap with try and print traceback on exception
         kwargs = self.get_kwargs(args_string)
-        backend_kwargs = self.get_kwargs_for_reminder_backend(kwargs)
-        self.reminder_backend.create(**backend_kwargs)
-        success_text = u'Created reminder: ' + backend_kwargs['text'] + '\n'
-        success_text = success_text.encode('utf-8')
-        self.stdout.write(success_text)
+        if kwargs.get('set_default_list'):
+            default_list = kwargs.get('set_default_list')
+            self.settings_backend['default_list_name'] = default_list
+            self.settings_backend.save()
+            success_text = u'Reminder list "{0}" is set as default\n'.format(default_list).encode('utf-8')
+            self.stdout.write(success_text)
+        else:
+            backend_kwargs = self.get_kwargs_for_reminder_backend(kwargs)
+            self.reminder_backend.create(**backend_kwargs)
+            success_text = u'Created reminder "{0}" in list "{1}"\n'.format(
+                backend_kwargs['text'],
+                backend_kwargs['list_name'],
+            )
+            success_text = success_text.encode('utf-8')
+            self.stdout.write(success_text)
 
 
 if __name__ == '__main__':
@@ -307,5 +366,6 @@ if __name__ == '__main__':
     Main(
         datetime=datetime, 
         reminder_backend=ReminderBackend(),
-        stdout=sys.stdout
+        stdout=sys.stdout,
+        settings_backend=SettingsBackend(),
     ).run(args_string=args_string)

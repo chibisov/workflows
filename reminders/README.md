@@ -71,6 +71,9 @@
     # reminder "Watch Football" with note "Spain vs Germany" 
     # on next friday on 10:45pm in "Sports" list
 
+    r --set-default-list Work
+    # set reminders list "Work" as default
+
 Case for words like "tomorrow" or "monday" is not sensitive. "TomorRrow" is same as "tomorrow".  
 Position of parameters is no matter. Next examples are equals:
     
@@ -96,17 +99,18 @@ Full set of params:
 * -a, --after
 * -d, --date
 * -t, --time
+* -sdl, --set-default-list
+
+## Changelog
+* 2013-08-25 - Added "--set-default-list" parameter
 
 ## TODO
 * "eof" text in notification after reminder creation. That happens only if reminder really created (right list name)
 * prints "Created", even if no list exists. Should check, if list exists
-* Default list is "Personal". Should allow to specify custom default list.  
-http://www.alfredforum.com/topic/307-workflows-best-practices/  
-For example type "r --default-list", and select from autocomplete default list (current default should be colored)
-Should save it to alfred workflow settings xml file
 * Click by notification should go to reminders app
 * Cant set "hello \r\n" text. They stripped
 * Help text while typing with list of parameters.
+* Clean mechanizm for exporting. Need to remove settings.json file.
 
 ## Inspired with 
 * https://github.com/mlgill/alfred-workflow-create-reminder, http://www.alfredforum.com/topic/402-create-reminder-in-remindersapp-from-alfred/
