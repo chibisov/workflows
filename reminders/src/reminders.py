@@ -40,7 +40,7 @@ class ReminderBackend(ReminderBackendBase):
         http://hints.macworld.com/article.php?story=20040617170055379
         """
         # todo: test me
-        make_command = 'make new reminder with properties {name:"%(text)s", due date:date("%(date_time)s")' % {
+        make_command = 'make new reminder with properties {name:"%(text)s", remind me date:date("%(date_time)s")' % {
             'text': text,
             'date_time': date_time.strftime('%d/%m/%Y %H:%M')
         }
