@@ -102,10 +102,10 @@ Full set of params:
 * -sdl, --set-default-list
 
 ## Changelog
+* 2013-09-14 - Removed "eof" text in notification after reminder creation.
 * 2013-08-25 - Added "--set-default-list" parameter
 
 ## TODO
-* "eof" text in notification after reminder creation. That happens only if reminder really created (right list name)
 * prints "Created", even if no list exists. Should check, if list exists
 * Click by notification should go to reminders app
 * Cant set "hello \r\n" text. They stripped

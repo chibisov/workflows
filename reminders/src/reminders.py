@@ -33,7 +33,7 @@ class ReminderBackend(ReminderBackendBase):
     def create(self, text, list_name, date_time, note=None):
         # todo: alert, if there is not such list
         make_command = self.get_make_command(text, list_name, date_time, note)
-        os.system(make_command.encode('utf-8'))
+        os.popen(make_command.encode('utf-8'))
 
     def get_make_command(self, text, list_name, date_time, note):
         """
