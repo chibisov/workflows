@@ -102,7 +102,9 @@ Full set of params:
 * -sdl, --set-default-list
 
 ## Changelog
-* 2013-09-14 - Removed "eof" text in notification after reminder creation.
+* 2013-09-14:
+    - #1 Fixed bug with note
+    - Removed "eof" text in notification after reminder creation.
 * 2013-08-25 - Added "--set-default-list" parameter
 
 ## TODO

@@ -45,7 +45,7 @@ class ReminderBackend(ReminderBackendBase):
             'date_time': date_time.strftime('%d/%m/%Y %H:%M')
         }
         if note:
-            make_command += ', note:%(note)s' % {'note': note}
+            make_command += ', body:"%(note)s"}' % {'note': note}
         else:
             make_command += '}'
 
