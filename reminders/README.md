@@ -108,6 +108,8 @@ Full set of params:
 * 2013-08-25 - Added "--set-default-list" parameter
 
 ## TODO
+* -r or --repeat (day, week, 2 weeks, month, year) for repeat
+* -p or --priority (low, medium, high) for priority
 * prints "Created", even if no list exists. Should check, if list exists
 * Click by notification should go to reminders app
 * Cant set "hello \r\n" text. They stripped
